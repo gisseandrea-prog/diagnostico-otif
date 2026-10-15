@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagnóstico Interactivo OTIF | AndesHome</title>
+  <style>
+    :root {
+      --rojo: #e74c3c;
+      --amarillo: #f39c12;
+      --verde: #27ae60;
+      --azul: #2980b9;
+      --fondo: #f0f4f8;
+      --blanco: #ffffff;
+      --texto: #2c3e50;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--fondo);
+      color: var(--texto);
+      line-height: 1.5;
+      padding: 20px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a5276, #2980b9);
+      color: white;
+      padding: 22px 28px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+
+    header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+    header p { opacity: 0.92; font-size: 0.95rem; }
+
+    .panel {
+      background: var(--blanco);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 22px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h2 {
+      font-size: 1.15rem;
+      color: #1a5276;
+      margin-bottom: 16px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .campo label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .campo input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 2px solid #dde3ea;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      transition: border-color 0.2s;
+    }
+
+    .campo input:focus {
+      outline: none;
+      border-color: var(--azul);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #1a5276, #2980b9);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 12px rgba(41,128,185,0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(41,128,185,0.4);
+    }
+
+    .btn:active { transform: translateY(0); }
+
+    .resultados { display: none; }
+
+    .tarjetas {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .tarjeta {
+      background: var(--blanco);
+      border-radius: 12px;
+      padding: 16px;
+      border-left: 6px solid #ccc;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .tarjeta.rojo { border-left-color: var(--rojo); }
+    .tarjeta.amarillo { border-left-color: var(--amarillo); }
+    .tarjeta.verde { border-left-color: var(--verde); }
+
+    .tarjeta h3 {
+      font-size: 0.8rem;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 6px;
+    }
+
+    .tarjeta .num {
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+
+    .tarjeta .brecha {
+      font-size: 0.9rem;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .tarjeta .brecha.mal { color: var(--rojo); }
+    .tarjeta .brecha.bien { color: var(--verde); }
+
+    .estado-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 3px 11px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .estado-badge.rojo { background: var(--rojo); }
+    .estado-badge.amarillo { background: var(--amarillo); }
+    .estado-badge.verde { background: var(--verde); }
+
+    .diagnostico {
+      background: #f8fafc;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .diagnostico h3 {
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      color: #1a5276;
+    }
+
+    .recomendacion {
+      background: white;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      border-left: 5px solid var(--azul);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .recomendacion.urgente { border-left-color: var(--rojo); }
+    .recomendacion.atencion { border-left-color: var(--amarillo); }
+    .recomendacion.ok { border-left-color: var(--verde); }
+
+    .recomendacion strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.95rem;
+    }
+
+    .recomendacion p {
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .prioridad {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      color: white;
+    }
+
+    .prioridad.alta { background: var(--rojo); }
+    .prioridad.media { background: var(--amarillo); }
+    .prioridad.baja { background: var(--verde); }
+
+    .nota-final {
+      margin-top: 18px;
+      padding: 14px 16px;
+      background: #e8f4fd;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #1a5276;
+    }
+
+    footer {
+      text-align: center;
+      color: #95a5a6;
+      font-size: 0.8rem;
+      margin-top: 28px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Diagnóstico Interactivo del OTIF</h1>
+    <p>AndesHome Chile · Escribe los números actuales y el sistema te dice qué está pasando y qué priorizar</p>
+  </header>
+
+  <!-- FORMULARIO DE ENTRADA -->
+  <div class="panel">
+    <h2>1. Ingresa los indicadores actuales</h2>
+    <p style="margin-bottom: 18px; color: #666; font-size: 0.95rem;">
+      Puedes sacar estos números del sistema de la empresa o de la base de datos. 
+      Si no tienes alguno, déjalo en blanco.
+    </p>
+
+    <div class="form-grid">
+      <div class="campo">
+        <label>OTIF actual (%)</label>
+        <input type="number" id="otif" step="0.1" min="0" max="100" placeholder="Ej: 80.9" value="80.9">
+      </div>
+      <div class="campo">
+        <label>Costo por pedido (CLP)</label>
+        <input type="number" id="costo" step="1" min="0" placeholder="Ej: 7920" value="7920">
+      </div>
+      <div class="campo">
+        <label>Dock-to-Stock (horas)</label>
+        <input type="number" id="dock" step="0.1" min="0" placeholder="Ej: 22.6" value="22.6">
+      </div>
+      <div class="campo">
+        <label>Precisión picking (%)</label>
+        <input type="number" id="picking" step="0.1" min="0" max="100" placeholder="Ej: 96.1" value="96.1">
+      </div>
+      <div class="campo">
+        <label>Exactitud inventario (%)</label>
+        <input type="number" id="inventario" step="0.1" min="0" max="100" placeholder="Ej: 93.8" value="93.8">
+      </div>
+      <div class="campo">
+        <label>CO₂e por pedido (kg)</label>
+        <input type="number" id="co2" step="0.01" min="0" placeholder="Ej: 2.22" value="2.22">
+      </div>
+    </div>
+
+    <button class="btn" onclick="diagnosticar()">Ver diagnóstico y recomendaciones</button>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div id="resultados" class="resultados">
+    
+    <div class="panel">
+      <h2>2. Estado actual de los indicadores</h2>
+      <div class="tarjetas" id="tarjetas"></div>
+    </div>
+
+    <div class="panel">
+      <h2>3. Diagnóstico y medidas recomendadas</h2>
+      <div class="diagnostico" id="recomendaciones"></div>
+    </div>
+
+  </div>
+
+  <footer>
+    Herramienta académica · AndesHome Chile · GLA1104 · Los valores por defecto corresponden a junio 2026
+  </footer>
+
+  <script>
+    // Metas del directorio
+    const metas = {
+      otif: 96,
+      costo: 5675,
+      dock: 8,
+      picking: 99.5,
+      inventario: 99.2,
+      co2: 1.545
+    };
+
+    function diagnosticar() {
+      // Leer valores
+      const otif = parseFloat(document.getElementById('otif').value) || 0;
+      const costo = parseFloat(document.getElementById('costo').value) || 0;
+      const dock = parseFloat(document.getElementById('dock').value) || 0;
+      const picking = parseFloat(document.getElementById('picking').value) || 0;
+      const inventario = parseFloat(document.getElementById('inventario').value) || 0;
+      const co2 = parseFloat(document.getElementById('co2').value) || 0;
+
+      // Mostrar sección de resultados
+      document.getElementById('resultados').style.display = 'block';
+
+      // Generar tarjetas
+      const tarjetas = document.getElementById('tarjetas');
+      tarjetas.innerHTML = '';
+
+      tarjetas.innerHTML += crearTarjeta('OTIF', otif, metas.otif, '%', true);
+      tarjetas.innerHTML += crearTarjeta('Costo por pedido', costo, metas.costo, 'CLP', false);
+      tarjetas.innerHTML += crearTarjeta('Dock-to-Stock', dock, metas.dock, 'h', false);
+      tarjetas.innerHTML += crearTarjeta('Precisión picking', picking, metas.picking, '%', true);
+      tarjetas.innerHTML += crearTarjeta('Exactitud inventario', inventario, metas.inventario, '%', true);
+      tarjetas.innerHTML += crearTarjeta('CO₂e por pedido', co2, metas.co2, 'kg', false);
+
+      // Generar recomendaciones
+      const rec = document.getElementById('recomendaciones');
+      let html = '';
+      let urgentes = 0;
+
+      // --- OTIF ---
+      if (otif < 85) {
+        urgentes++;
+        html += recomendacion('alta', 'OTIF muy bajo (crítico)', 
+          'El servicio está en zona de peligro. Hay que atacar de inmediato los 3 cuellos de botella: recepción (ASN), picking (slotting) y packing. Sin estas acciones el OTIF seguirá cayendo en el próximo peak.');
+      } else if (otif < 92) {
+        html += recomendacion('media', 'OTIF bajo (atención)', 
+          'Todavía no llegamos a la meta. Priorizar las mejoras de inbound y de precisión de picking. El margen de error es estrecho para el próximo peak.');
+      } else if (otif < 96) {
+        html += recomendacion('baja', 'OTIF cerca de la meta', 
+          'Vamos bien, pero aún falta. Enfocarse en consolidar las mejoras ya hechas y medir mes a mes para no perder lo ganado.');
+      } else {
+        html += recomendacion('baja', 'OTIF cumpliendo meta', 
+          '¡Excelente! El servicio está en el nivel esperado. Ahora el foco es mantenerlo y no relajar los controles.');
+      }
+
+      // --- Dock-to-Stock ---
+      if (dock > 15) {
+        urgentes++;
+        html += recomendacion('alta', 'Dock-to-Stock muy alto', 
+          'Los camiones están demorando demasiado en andén. Acelerar el portal ASN y la agenda de citas. Mientras más tarde la mercancía en estar disponible, más se atrasa el OTIF.');
+      } else if (dock > 10) {
+        html += recomendacion('media', 'Dock-to-Stock elevado', 
+          'Hay demora en recepción. Revisar adopción de ASN y cumplimiento de citas de los proveedores. Es una de las causas más directas del OTIF bajo.');
+      }
+
+      // --- Precisión picking ---
+      if (picking < 97) {
+        urgentes++;
+        html += recomendacion('alta', 'Precisión de picking baja', 
+          'Muchos errores en preparación. Priorizar re-slotting (poner los productos de alta rotación cerca) y el formador de turnos según competencias. Cada error de picking baja el OTIF.');
+      } else if (picking < 99) {
+        html += recomendacion('media', 'Precisión de picking mejorable', 
+          'Todavía hay margen. Completar el re-slotting y reforzar la formación del personal en radiofrecuencia.');
+      }
+
+      // --- Exactitud inventario ---
+      if (inventario < 95) {
+        urgentes++;
+        html += recomendacion('alta', 'Exactitud de inventario crítica', 
+          'El sistema muestra stock que en realidad no está. Esto genera pedidos incompletos y baja el OTIF. Iniciar conteos cíclicos de los productos más importantes (ABC).');
+      } else if (inventario < 98) {
+        html += recomendacion('media', 'Exactitud de inventario baja', 
+          'Hay diferencias entre lo físico y el sistema. Implementar conteos más frecuentes en zona A y B.');
+      }
+
+      // --- Costo ---
+      if (costo > 7000) {
+        html += recomendacion('media', 'Costo por pedido muy alto', 
+          'El costo está disparado (horas extras, reprocesos, demoras). Las mismas acciones que suben el OTIF (ASN, slotting, menos errores) también bajan el costo. Son dos caras de la misma moneda.');
+      }
+
+      // --- CO2 ---
+      if (co2 > 2.0) {
+        html += recomendacion('baja', 'Emisiones por pedido altas', 
+          'Hay espacio para mejorar embalaje (right-sizing) y utilización de camiones. Esto no es lo más urgente para el OTIF, pero ayuda a la meta de sostenibilidad.');
+      }
+
+      // Mensaje final según cantidad de urgentes
+      if (urgentes >= 3) {
+        html += `<div class="nota-final"><strong>Situación general:</strong> Hay varios indicadores en rojo. Se recomienda atacar primero el inbound (portal ASN) y el slotting, porque son los que más rápido impactan el OTIF.</div>`;
+      } else if (urgentes >= 1) {
+        html += `<div class="nota-final"><strong>Situación general:</strong> Hay puntos críticos, pero el camino está claro. Concentrar esfuerzos en las recomendaciones de prioridad alta.</div>`;
+      } else {
+        html += `<div class="nota-final"><strong>Situación general:</strong> Los indicadores están en buen camino. Mantener el control mes a mes para no perder lo ganado antes del próximo peak.</div>`;
+      }
+
+      rec.innerHTML = html;
+
+      // Scroll suave a los resultados
+      document.getElementById('resultados').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function crearTarjeta(nombre, valor, meta, unidad, mayorEsMejor) {
+      let estado, clase, textoBrecha, claseBrecha;
+
+      if (mayorEsMejor) {
+        // OTIF, picking, inventario → más alto es mejor
+        if (valor >= meta) {
+          estado = 'Cumple'; clase = 'verde';
+          textoBrecha = 'Meta alcanzada';
+          claseBrecha = 'bien';
+        } else if (valor >= meta - 5) {
+          estado = 'Cerca'; clase = 'amarillo';
+          textoBrecha = `Faltan ${(meta - valor).toFixed(1)} puntos`;
+          claseBrecha = 'mal';
+        } else {
+          estado = 'Crítico'; clase = 'rojo';
+          textoBrecha = `Brecha: –${(meta - valor).toFixed(1)} puntos`;
+          claseBrecha = 'mal';
+        }
+      } else {
+        // Costo, dock, co2 → más bajo es mejor
+        if (valor <= meta) {
+          estado = 'Cumple'; clase = 'verde';
+          textoBrecha = 'Meta alcanzada';
+          claseBrecha = 'bien';
+        } else if (valor <= meta * 1.3) {
+          estado = 'Atención'; clase = 'amarillo';
+          textoBrecha = `+${(valor - meta).toFixed(1)} sobre la meta`;
+          claseBrecha = 'mal';
+        } else {
+          estado = 'Crítico'; clase = 'rojo';
+          textoBrecha = `+${(valor - meta).toFixed(1)} sobre la meta`;
+          claseBrecha = 'mal';
+        }
+      }
+
+      // Formato del número
+      let valorMostrar = valor;
+      if (unidad === 'CLP') valorMostrar = '$' + valor.toLocaleString('es-CL');
+      else if (unidad === '%') valorMostrar = valor + '%';
+      else if (unidad === 'h') valorMostrar = valor + ' h';
+      else if (unidad === 'kg') valorMostrar = valor + ' kg';
+
+      return `
+        <div class="tarjeta ${clase}">
+          <h3>${nombre}</h3>
+          <div class="num">${valorMostrar}</div>
+          <div class="brecha ${claseBrecha}">${textoBrecha}</div>
+          <span class="estado-badge ${clase}">${estado}</span>
+        </div>
+      `;
+    }
+
+    function recomendacion(prioridad, titulo, texto) {
+      const clase = prioridad === 'alta' ? 'urgente' : (prioridad === 'media' ? 'atencion' : 'ok');
+      const label = prioridad === 'alta' ? 'Prioridad alta' : (prioridad === 'media' ? 'Prioridad media' : 'Prioridad baja');
+      return `
+        <div class="recomendacion ${clase}">
+          <span class="prioridad ${prioridad}">${label}</span>
+          <strong>${titulo}</strong>
+          <p>${texto}</p>
+        </div>
+      `;
+    }
+
+    // Ejecutar al cargar con los valores por defecto
+    window.onload = function() {
+      diagnosticar();
+    };
+  </script>
+</body>
+</html>
